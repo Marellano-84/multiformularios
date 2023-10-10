@@ -98,7 +98,8 @@ class _SegundoFormularioState extends State<SegundoFormulario> {
 
   void validarDatos() {
     setState(() {
-      validacionExitosa = widget.contrasena == "123";
+      validacionExitosa =
+          widget.usuario == "admin" && widget.contrasena == "123";
     });
 
     if (validacionExitosa) {
