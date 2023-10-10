@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'bienvenida.dart';
 
 void main() {
   runApp(MiClase());
@@ -16,7 +15,12 @@ class MiClase extends StatelessWidget {
   }
 }
 
-class Pantalla extends StatelessWidget {
+class Pantalla extends StatefulWidget {
+  @override
+  _PantallaState createState() => _PantallaState();
+}
+
+class _PantallaState extends State<Pantalla> {
   final txtLogin = TextEditingController();
   final txtClave = TextEditingController();
 
@@ -36,7 +40,10 @@ class Pantalla extends StatelessWidget {
             child: TextField(
               controller: txtLogin,
               textAlign: TextAlign.center,
-              decoration: InputDecoration(hintText: "Usuario"),
+              decoration: InputDecoration(
+                hintText: "Usuario",
+                prefixIcon: Icon(Icons.person), // Icono para usuario
+              ),
             ),
           ),
           Container(
@@ -44,7 +51,10 @@ class Pantalla extends StatelessWidget {
             child: TextField(
               controller: txtClave,
               textAlign: TextAlign.center,
-              decoration: InputDecoration(hintText: "Contraseña"),
+              decoration: InputDecoration(
+                hintText: "Contraseña",
+                prefixIcon: Icon(Icons.lock), // Icono para contraseña
+              ),
               obscureText: true,
             ),
           ),
@@ -53,46 +63,135 @@ class Pantalla extends StatelessWidget {
             alignment: Alignment.center,
             child: ElevatedButton.icon(
               onPressed: () {
-                // Leemos los campos de texto
                 String usu = txtLogin.text;
                 String pass = txtClave.text;
 
-                // Condicionales
-                if (usu == "admin" && pass == "123") {
-                  // Navegar a la pantalla de bienvenida
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Bienvenida(usu),
-                    ),
-                  );
-                } else {
-                  // Mostrar un diálogo de error si las credenciales son incorrectas
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text("Error"),
-                        content: Text(
-                            "Credenciales incorrectas. Inténtalo de nuevo."),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text("OK"),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                }
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SegundoFormulario(usu, pass),
+                  ),
+                );
               },
               icon: Icon(Icons.login),
-              label: Text("Iniciar sesión"),
+              label: Text("Enviar Datos"),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class SegundoFormulario extends StatefulWidget {
+  final String usuario;
+  final String contrasena;
+
+  SegundoFormulario(this.usuario, this.contrasena);
+
+  @override
+  _SegundoFormularioState createState() => _SegundoFormularioState();
+}
+
+class _SegundoFormularioState extends State<SegundoFormulario> {
+  bool validacionExitosa = false;
+
+  void validarDatos() {
+    setState(() {
+      validacionExitosa = widget.contrasena == "123";
+    });
+
+    if (validacionExitosa) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Bienvenido"),
+            content: Text("Bienvenido, ${widget.usuario}"),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Error"),
+            content: Text("Credenciales incorrectas. Inténtalo de nuevo."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.pop(context); // Volver al login
+                },
+                child: Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Bienvenida'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              'Datos ingresados:',
+              style: TextStyle(fontSize: 20.0),
+            ),
+            SizedBox(height: 10.0),
+            Text(
+              'Usuario: ${widget.usuario}',
+              style: TextStyle(fontSize: 16.0),
+            ),
+            Text(
+              'Contraseña: ${widget.contrasena}',
+              style: TextStyle(fontSize: 16.0),
+            ),
+            SizedBox(height: 20.0),
+            ElevatedButton(
+              onPressed: validarDatos,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.check), // Icono para validar
+                  SizedBox(width: 8.0),
+                  Text('Validar'),
+                ],
+              ),
+            ),
+            SizedBox(height: 10.0),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.arrow_back), // Icono para volver
+                  SizedBox(width: 8.0),
+                  Text('Volver al login'),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
